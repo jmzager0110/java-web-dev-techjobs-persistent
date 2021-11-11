@@ -1,7 +1,10 @@
 package org.launchcode.javawebdevtechjobspersistent.controllers;
 
 import org.launchcode.javawebdevtechjobspersistent.models.Job;
+import org.launchcode.javawebdevtechjobspersistent.models.Skill;
 import org.launchcode.javawebdevtechjobspersistent.models.data.EmployerRepository;
+import org.launchcode.javawebdevtechjobspersistent.models.data.JobRepository;
+import org.launchcode.javawebdevtechjobspersistent.models.data.SkillRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +22,12 @@ public class HomeController {
 
     @Autowired
     private EmployerRepository employerRepository;
+
+    @Autowired
+    private JobRepository jobRepository;
+
+    @Autowired
+    private SkillRepository skillRepository;
 
     @RequestMapping("")
     public String index(Model model) {
@@ -44,8 +53,12 @@ public class HomeController {
             model.addAttribute("title", "Add Job");
             return "add";
         } else {
-            employerRepository.findById(employerId);
-            //save new job by accessing employerId maybe?
+            List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
+            newJob.setSkills(skillObjs);
+            //Task 3 SubTask 4 - select the emp obj thats been chosen to be affiliated with the new job
+            model.addAttribute("employerId", employerRepository.findById(employerId));
+            jobRepository.save(newJob);
+
             return "redirect:";
         }
     }
