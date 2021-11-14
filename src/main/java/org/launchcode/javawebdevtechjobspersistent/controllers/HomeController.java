@@ -1,5 +1,6 @@
 package org.launchcode.javawebdevtechjobspersistent.controllers;
 
+import org.launchcode.javawebdevtechjobspersistent.models.Employer;
 import org.launchcode.javawebdevtechjobspersistent.models.Job;
 import org.launchcode.javawebdevtechjobspersistent.models.Skill;
 import org.launchcode.javawebdevtechjobspersistent.models.data.EmployerRepository;
@@ -31,16 +32,16 @@ public class HomeController {
 
     @RequestMapping("")
     public String index(Model model) {
-
         model.addAttribute("title", "My Jobs");
-
+        model.addAttribute("jobs", jobRepository.findAll());
         return "index";
     }
 
     @GetMapping("add")
-    public String displayAddJobForm(Model model, Integer employerId) {
+    public String displayAddJobForm(Model model) {
         model.addAttribute("title", "Add Job");
-        model.addAttribute("employerId", employerRepository.findById(employerId));
+        model.addAttribute("employers", employerRepository.findAll());
+        model.addAttribute("skills", skillRepository.findAll());
         model.addAttribute(new Job());
         return "add";
     }
@@ -53,10 +54,10 @@ public class HomeController {
             model.addAttribute("title", "Add Job");
             return "add";
         } else {
+            Employer employer = employerRepository.findById(employerId).orElse(new Employer());
+            newJob.setEmployer(employer);
             List<Skill> skillObjs = (List<Skill>) skillRepository.findAllById(skills);
             newJob.setSkills(skillObjs);
-            //Task 3 SubTask 4 - select the emp obj thats been chosen to be affiliated with the new job
-            model.addAttribute("employerId", employerRepository.findById(employerId));
             jobRepository.save(newJob);
 
             return "redirect:";
@@ -65,7 +66,8 @@ public class HomeController {
 
     @GetMapping("view/{jobId}")
     public String displayViewJob(Model model, @PathVariable int jobId) {
-
+        Job job = jobRepository.findById(jobId).orElse(new Job());
+        model.addAttribute("job", job);
         return "view";
     }
 
